@@ -5,81 +5,108 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Plus, Search, Filter, MoreHorizontal, Edit, Trash2, Eye } from "lucide-react";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, Search, Edit, Trash2, Eye, FileText } from "lucide-react";
+import { toast } from "sonner";
 
 const contentData = [
   {
     id: 1,
-    title: "Getting Started with React Hooks",
-    type: "Blog",
-    status: "Published",
+    title: "Getting Started with React",
+    excerpt: "Learn the basics of React development...",
+    status: "published",
+    category: "Development",
     author: "John Doe",
-    date: "2024-01-15",
-    views: 1234
+    createdAt: "2024-01-15",
+    views: 1250
   },
   {
     id: 2,
-    title: "Advanced JavaScript Concepts",
-    type: "Tutorial",
-    status: "Draft",
+    title: "UI/UX Design Principles",
+    excerpt: "Essential principles for good design...",
+    status: "draft",
+    category: "Design",
     author: "Jane Smith",
-    date: "2024-01-14",
-    views: 856
+    createdAt: "2024-01-14",
+    views: 890
   },
   {
     id: 3,
-    title: "API Documentation Guide",
-    type: "Documentation",
-    status: "Published",
+    title: "Modern JavaScript Features",
+    excerpt: "Explore ES6+ features and beyond...",
+    status: "published",
+    category: "Technology",
     author: "Mike Johnson",
-    date: "2024-01-13",
-    views: 2341
-  },
-  {
-    id: 4,
-    title: "Design System Guidelines",
-    type: "Guide",
-    status: "Review",
-    author: "Sarah Wilson",
-    date: "2024-01-12",
-    views: 567
+    createdAt: "2024-01-13",
+    views: 2100
   }
 ];
 
 export default function Content() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newContent, setNewContent] = useState({
+    title: "",
+    body: "",
+    category: "",
+    status: "draft"
+  });
+
+  const filteredContent = contentData.filter(item => {
+    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         item.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || item.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const handleCreateContent = () => {
+    if (!newContent.title.trim()) {
+      toast.error("Content title is required");
+      return;
+    }
+    
+    toast.success(`Content "${newContent.title}" created successfully!`);
+    setNewContent({ title: "", body: "", category: "", status: "draft" });
+    setIsDialogOpen(false);
+  };
+
+  const handleEditContent = (title: string) => {
+    toast.info(`Edit content "${title}" functionality coming soon!`);
+  };
+
+  const handleDeleteContent = (title: string) => {
+    toast.success(`Content "${title}" deleted successfully!`);
+  };
+
+  const handleViewContent = (title: string) => {
+    toast.info(`Viewing content "${title}"`);
+  };
 
   const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
+    switch (status) {
       case "published":
         return "bg-green-100 text-green-800";
       case "draft":
         return "bg-yellow-100 text-yellow-800";
-      case "review":
-        return "bg-blue-100 text-blue-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
-
-  const filteredContent = contentData.filter(content =>
-    content.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    content.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    content.author.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -88,15 +115,79 @@ export default function Content() {
       <main className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Content Management</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Content</h1>
             <p className="text-muted-foreground">
-              Manage your blog posts, tutorials, and documentation
+              Manage your articles and posts
             </p>
           </div>
-          <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
-            <Plus className="h-4 w-4 mr-2" />
-            New Content
-          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                <Plus className="h-4 w-4 mr-2" />
+                New Content
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Create New Content</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="title">Title</Label>
+                  <Input 
+                    id="title" 
+                    placeholder="Enter content title"
+                    value={newContent.title}
+                    onChange={(e) => setNewContent(prev => ({ ...prev, title: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="body">Content</Label>
+                  <Textarea 
+                    id="body" 
+                    placeholder="Write your content here..."
+                    rows={6}
+                    value={newContent.body}
+                    onChange={(e) => setNewContent(prev => ({ ...prev, body: e.target.value }))}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="category">Category</Label>
+                    <Select value={newContent.category} onValueChange={(value) => setNewContent(prev => ({ ...prev, category: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="technology">Technology</SelectItem>
+                        <SelectItem value="design">Design</SelectItem>
+                        <SelectItem value="development">Development</SelectItem>
+                        <SelectItem value="business">Business</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="status">Status</Label>
+                    <Select value={newContent.status} onValueChange={(value) => setNewContent(prev => ({ ...prev, status: value }))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="published">Published</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <Button 
+                  onClick={handleCreateContent}
+                  className="w-full"
+                >
+                  Create Content
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="flex items-center space-x-4">
@@ -109,66 +200,77 @@ export default function Content() {
               className="pl-10"
             />
           </div>
-          <Button variant="outline">
-            <Filter className="h-4 w-4 mr-2" />
-            Filter
-          </Button>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        <div className="bg-white rounded-lg border shadow-sm">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Author</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Views</TableHead>
-                <TableHead className="w-[70px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredContent.map((content) => (
-                <TableRow key={content.id}>
-                  <TableCell className="font-medium">{content.title}</TableCell>
-                  <TableCell>{content.type}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(content.status)}>
-                      {content.status}
+        <div className="grid gap-6">
+          {filteredContent.map((item) => (
+            <div key={item.id} className="bg-white rounded-lg border shadow-sm p-6 hover:shadow-md transition-shadow">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <FileText className="h-5 w-5 text-muted-foreground" />
+                    <h3 className="font-semibold text-lg">{item.title}</h3>
+                    <Badge className={getStatusColor(item.status)}>
+                      {item.status}
                     </Badge>
-                  </TableCell>
-                  <TableCell>{content.author}</TableCell>
-                  <TableCell>{content.date}</TableCell>
-                  <TableCell>{content.views.toLocaleString()}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="h-4 w-4 mr-2" />
-                          View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </div>
+                  <p className="text-gray-600 mb-3">{item.excerpt}</p>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span>By {item.author}</span>
+                    <span>•</span>
+                    <span>Category: {item.category}</span>
+                    <span>•</span>
+                    <span>{item.createdAt}</span>
+                    <span>•</span>
+                    <span>{item.views} views</span>
+                  </div>
+                </div>
+                <div className="flex gap-2 ml-4">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleViewContent(item.title)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleEditContent(item.title)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-red-600 hover:text-red-700"
+                    onClick={() => handleDeleteContent(item.title)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
+
+        {filteredContent.length === 0 && (
+          <div className="text-center py-12">
+            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No content found</h3>
+            <p className="text-muted-foreground">Try adjusting your search or create new content.</p>
+          </div>
+        )}
       </main>
     </div>
   );

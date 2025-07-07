@@ -1,5 +1,5 @@
 
-import { Search, Bell, User, Plus, Command } from "lucide-react";
+import { Search, Bell, User, Plus, Command, LogOut, Settings, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,17 +11,60 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export function DashboardHeader() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [notifications] = useState(3); // Mock notification count
+
+  const handleNewProject = () => {
+    toast.success("New project creation coming soon!");
+  };
+
+  const handleNotifications = () => {
+    toast.info("You have 3 new notifications");
+  };
+
+  const handleProfile = () => {
+    toast.info("Profile page coming soon!");
+  };
+
+  const handleSettings = () => {
+    navigate("/settings");
+  };
+
+  const handleBilling = () => {
+    toast.info("Billing page coming soon!");
+  };
+
+  const handleLogout = () => {
+    logout();
+    toast.success("Logged out successfully");
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const query = formData.get("search") as string;
+    if (query.trim()) {
+      toast.info(`Searching for: ${query}`);
+    }
+  };
+
   return (
     <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="flex items-center justify-between h-full px-4">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
           
-          <div className="relative max-w-md w-full">
+          <form onSubmit={handleSearch} className="relative max-w-md w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
+              name="search"
               placeholder="Search projects, deployments..."
               className="pl-10 pr-4 bg-muted/50 border-0 focus-visible:ring-1 focus-visible:ring-primary/20"
             />
@@ -30,18 +73,29 @@ export function DashboardHeader() {
                 <Command className="h-3 w-3" />K
               </kbd>
             </div>
-          </div>
+          </form>
         </div>
 
         <div className="flex items-center gap-3">
-          <Button size="sm" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-md">
+          <Button 
+            size="sm" 
+            onClick={handleNewProject}
+            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-md"
+          >
             <Plus className="h-4 w-4 mr-2" />
             New Project
           </Button>
           
-          <Button variant="ghost" size="sm" className="relative">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="relative"
+            onClick={handleNotifications}
+          >
             <Bell className="h-4 w-4" />
-            <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+            {notifications > 0 && (
+              <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+            )}
           </Button>
 
           <DropdownMenu>
@@ -57,15 +111,27 @@ export function DashboardHeader() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <div className="flex flex-col space-y-1 p-2">
-                <p className="text-sm font-medium">John Doe</p>
-                <p className="text-xs text-muted-foreground">john@example.com</p>
+                <p className="text-sm font-medium">{user?.name || "John Doe"}</p>
+                <p className="text-xs text-muted-foreground">{user?.email || "john@example.com"}</p>
               </div>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Billing</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleProfile} className="cursor-pointer">
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSettings} className="cursor-pointer">
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleBilling} className="cursor-pointer">
+                <CreditCard className="mr-2 h-4 w-4" />
+                Billing
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
+                <LogOut className="mr-2 h-4 w-4" />
+                Log out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

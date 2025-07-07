@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Plus, Search, Edit, Trash2, Tag } from "lucide-react";
+import { toast } from "sonner";
 
 const categoriesData = [
   {
@@ -48,11 +49,35 @@ const categoriesData = [
 export default function Categories() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newCategory, setNewCategory] = useState({ name: "", description: "" });
 
   const filteredCategories = categoriesData.filter(category =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     category.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleCreateCategory = () => {
+    if (!newCategory.name.trim()) {
+      toast.error("Category name is required");
+      return;
+    }
+    
+    toast.success(`Category "${newCategory.name}" created successfully!`);
+    setNewCategory({ name: "", description: "" });
+    setIsDialogOpen(false);
+  };
+
+  const handleEditCategory = (categoryName: string) => {
+    toast.info(`Edit category "${categoryName}" functionality coming soon!`);
+  };
+
+  const handleDeleteCategory = (categoryName: string) => {
+    toast.success(`Category "${categoryName}" deleted successfully!`);
+  };
+
+  const handleViewContent = (categoryName: string) => {
+    toast.info(`Viewing content for "${categoryName}" category`);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -80,14 +105,24 @@ export default function Categories() {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="name">Category Name</Label>
-                  <Input id="name" placeholder="Enter category name" />
+                  <Input 
+                    id="name" 
+                    placeholder="Enter category name"
+                    value={newCategory.name}
+                    onChange={(e) => setNewCategory(prev => ({ ...prev, name: e.target.value }))}
+                  />
                 </div>
                 <div>
                   <Label htmlFor="description">Description</Label>
-                  <Input id="description" placeholder="Enter description" />
+                  <Input 
+                    id="description" 
+                    placeholder="Enter description"
+                    value={newCategory.description}
+                    onChange={(e) => setNewCategory(prev => ({ ...prev, description: e.target.value }))}
+                  />
                 </div>
                 <Button 
-                  onClick={() => setIsDialogOpen(false)}
+                  onClick={handleCreateCategory}
                   className="w-full"
                 >
                   Create Category
@@ -123,10 +158,19 @@ export default function Categories() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="sm">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleEditCategory(category.name)}
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-red-600 hover:text-red-700"
+                    onClick={() => handleDeleteCategory(category.name)}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -136,7 +180,11 @@ export default function Categories() {
                 <Badge variant="secondary">
                   {category.contentCount} articles
                 </Badge>
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleViewContent(category.name)}
+                >
                   View Content
                 </Button>
               </div>
