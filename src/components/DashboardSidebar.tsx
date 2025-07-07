@@ -9,7 +9,9 @@ import {
   BarChart3,
   Plus,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  FileText,
+  Tags
 } from "lucide-react";
 import {
   Sidebar,
@@ -20,28 +22,29 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 
 const mainItems = [
-  { title: "Overview", url: "/", icon: LayoutDashboard },
-  { title: "Projects", url: "/projects", icon: FolderOpen },
+  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Content", url: "/content", icon: FileText },
+  { title: "Categories", url: "/categories", icon: Tags },
+  { title: "Users", url: "/users", icon: Users },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
-  { title: "Team", url: "/team", icon: Users },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
-const projects = [
-  { name: "my-portfolio", status: "Ready", url: "https://my-portfolio.vercel.app" },
-  { name: "ecommerce-app", status: "Building", url: "https://ecommerce-app.vercel.app" },
-  { name: "blog-site", status: "Ready", url: "https://blog-site.vercel.app" },
+const recentContent = [
+  { name: "Getting Started Guide", status: "Published", type: "blog" },
+  { name: "API Documentation", status: "Draft", type: "docs" },
+  { name: "User Tutorial", status: "Published", type: "blog" },
 ];
 
 export function DashboardSidebar() {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
   const location = useLocation();
-  const [projectsExpanded, setProjectsExpanded] = useState(true);
+  const [contentExpanded, setContentExpanded] = useState(true);
+  const collapsed = state === "collapsed";
   
   const isActive = (path: string) => location.pathname === path;
   
@@ -53,17 +56,17 @@ export function DashboardSidebar() {
     }`;
 
   return (
-    <Sidebar className={collapsed ? "w-16" : "w-64"} collapsible>
+    <Sidebar className={collapsed ? "w-16" : "w-64"} collapsible="icon">
       <SidebarContent className="bg-card border-r">
         <div className="p-4 border-b">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">V</span>
+              <span className="text-white font-bold text-sm">C</span>
             </div>
             {!collapsed && (
               <div>
-                <h2 className="font-semibold text-sm">Vercel Dashboard</h2>
-                <p className="text-xs text-muted-foreground">Personal Account</p>
+                <h2 className="font-semibold text-sm">CMS Dashboard</h2>
+                <p className="text-xs text-muted-foreground">Content Management</p>
               </div>
             )}
           </div>
@@ -94,13 +97,13 @@ export function DashboardSidebar() {
           <SidebarGroup>
             <SidebarGroupLabel className="flex items-center justify-between px-3 py-2">
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Projects
+                Recent Content
               </span>
               <button
-                onClick={() => setProjectsExpanded(!projectsExpanded)}
+                onClick={() => setContentExpanded(!contentExpanded)}
                 className="p-1 rounded hover:bg-muted/50"
               >
-                {projectsExpanded ? (
+                {contentExpanded ? (
                   <ChevronDown className="h-3 w-3" />
                 ) : (
                   <ChevronRight className="h-3 w-3" />
@@ -108,23 +111,25 @@ export function DashboardSidebar() {
               </button>
             </SidebarGroupLabel>
             
-            {projectsExpanded && (
+            {contentExpanded && (
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {projects.map((project) => (
-                    <SidebarMenuItem key={project.name}>
+                  {recentContent.map((content) => (
+                    <SidebarMenuItem key={content.name}>
                       <SidebarMenuButton asChild>
                         <div className="flex items-center justify-between w-full px-3 py-2 text-sm rounded-md hover:bg-muted/50 cursor-pointer">
                           <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                            <span className="truncate">{project.name}</span>
+                            <div className={`w-2 h-2 rounded-full ${
+                              content.status === 'Published' ? 'bg-green-500' : 'bg-yellow-500'
+                            }`}></div>
+                            <span className="truncate">{content.name}</span>
                           </div>
                           <span className={`text-xs px-2 py-1 rounded-full ${
-                            project.status === 'Ready' 
+                            content.status === 'Published' 
                               ? 'bg-green-100 text-green-700'
                               : 'bg-yellow-100 text-yellow-700'
                           }`}>
-                            {project.status}
+                            {content.status}
                           </span>
                         </div>
                       </SidebarMenuButton>
@@ -135,7 +140,7 @@ export function DashboardSidebar() {
                     <SidebarMenuButton asChild>
                       <div className="flex items-center gap-2 w-full px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 cursor-pointer">
                         <Plus className="h-4 w-4" />
-                        <span>Add Project</span>
+                        <span>New Content</span>
                       </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
