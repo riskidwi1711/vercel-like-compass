@@ -1,4 +1,3 @@
-
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { StatsCard } from "@/components/StatsCard";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import {
   FileText,
   Tags
 } from "lucide-react";
+import { useWebsite } from "@/hooks/useWebsite";
 
 const recentActivity = [
   {
@@ -45,6 +45,7 @@ const recentActivity = [
 
 export default function Index() {
   const { data: stats, isLoading, error } = useDashboardStats();
+  const { selectedWebsite } = useWebsite();
 
   // Default stats while loading or on error
   const defaultStats = [
@@ -78,18 +79,32 @@ export default function Index() {
     }
   ];
 
+  if (!selectedWebsite) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <DashboardHeader />
+        <main className="p-6 flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <Globe className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Welcome to Multi-Tenant CMS</h3>
+            <p className="text-muted-foreground">Please select or create a website to get started.</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <DashboardHeader />
       
       <main className="p-6 space-y-8">
-        {/* Welcome Section */}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">
-            Welcome to CMS Dashboard! 👋
+            Welcome to {selectedWebsite.name}! 👋
           </h1>
           <p className="text-muted-foreground text-lg">
-            Manage your content, users, and analytics from here.
+            Manage content, users, and analytics for {selectedWebsite.domain}
           </p>
         </div>
 

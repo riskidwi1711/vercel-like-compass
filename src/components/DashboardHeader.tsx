@@ -1,4 +1,3 @@
-
 import { Search, Bell, User, Plus, Command, LogOut, Settings, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,9 +14,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useState } from "react";
+import { WebsiteSelector } from "./WebsiteSelector";
+import { useWebsite } from "@/hooks/useWebsite";
 
 export function DashboardHeader() {
   const { user, logout } = useAuth();
+  const { selectedWebsite } = useWebsite();
   const navigate = useNavigate();
   const [notifications] = useState(3); // Mock notification count
 
@@ -61,6 +63,8 @@ export function DashboardHeader() {
         <div className="flex items-center gap-4">
           <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
           
+          <WebsiteSelector />
+          
           <form onSubmit={handleSearch} className="relative max-w-md w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -81,6 +85,7 @@ export function DashboardHeader() {
             size="sm" 
             onClick={handleNewProject}
             className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-md"
+            disabled={!selectedWebsite}
           >
             <Plus className="h-4 w-4 mr-2" />
             New Project

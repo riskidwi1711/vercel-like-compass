@@ -1,14 +1,21 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { apiService } from '@/services/api';
+import { useWebsite } from './useWebsite';
 
 export function useDashboardStats() {
+  const { selectedWebsiteId } = useWebsite();
+  
   return useQuery({
-    queryKey: ['dashboard-stats'],
+    queryKey: ['dashboard-stats', selectedWebsiteId],
     queryFn: async () => {
-      const response = await apiService.getDashboardStats();
+      if (!selectedWebsiteId) {
+        throw new Error('No website selected');
+      }
+      const response = await apiService.getDashboardStats(selectedWebsiteId);
       return response.data;
     },
-    refetchInterval: 30000, // Refetch every 30 seconds
+    enabled: !!selectedWebsiteId,
+    refetchInterval: 30000,
   });
 }

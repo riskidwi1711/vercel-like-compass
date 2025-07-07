@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { DashboardHeader } from "@/components/DashboardHeader";
 import { Button } from "@/components/ui/button";
@@ -12,8 +11,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, Search, Edit, Trash2, Tag } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Tag, Globe } from "lucide-react";
 import { toast } from "sonner";
+import { useWebsite } from "@/hooks/useWebsite";
 
 const categoriesData = [
   {
@@ -47,6 +47,7 @@ const categoriesData = [
 ];
 
 export default function Categories() {
+  const { selectedWebsite, selectedWebsiteId } = useWebsite();
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState({ name: "", description: "" });
@@ -57,12 +58,17 @@ export default function Categories() {
   );
 
   const handleCreateCategory = () => {
+    if (!selectedWebsiteId) {
+      toast.error("Please select a website first");
+      return;
+    }
+    
     if (!newCategory.name.trim()) {
       toast.error("Category name is required");
       return;
     }
     
-    toast.success(`Category "${newCategory.name}" created successfully!`);
+    toast.success(`Category "${newCategory.name}" created for ${selectedWebsite?.name}!`);
     setNewCategory({ name: "", description: "" });
     setIsDialogOpen(false);
   };
@@ -79,6 +85,21 @@ export default function Categories() {
     toast.info(`Viewing content for "${categoryName}" category`);
   };
 
+  if (!selectedWebsite) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <DashboardHeader />
+        <main className="p-6 flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <Globe className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No Website Selected</h3>
+            <p className="text-muted-foreground">Please select a website to manage categories.</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <DashboardHeader />
@@ -88,7 +109,7 @@ export default function Categories() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Categories</h1>
             <p className="text-muted-foreground">
-              Organize your content with categories
+              Organize content for <span className="font-medium">{selectedWebsite.name}</span>
             </p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
