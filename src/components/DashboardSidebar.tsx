@@ -3,15 +3,15 @@ import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
-  FolderOpen,
-  Settings,
+  FileText,
+  Tags,
   Users,
   BarChart3,
+  Settings,
   Plus,
   ChevronDown,
   ChevronRight,
-  FileText,
-  Tags
+  CheckCircle
 } from "lucide-react";
 import {
   Sidebar,
@@ -60,13 +60,13 @@ export function DashboardSidebar() {
       <SidebarContent className="bg-card border-r">
         <div className="p-4 border-b">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-sm">C</span>
             </div>
             {!collapsed && (
-              <div>
-                <h2 className="font-semibold text-sm">CMS Dashboard</h2>
-                <p className="text-xs text-muted-foreground">Content Management</p>
+              <div className="min-w-0">
+                <h2 className="font-semibold text-sm truncate">CMS Dashboard</h2>
+                <p className="text-xs text-muted-foreground truncate">Content Management</p>
               </div>
             )}
           </div>
@@ -82,9 +82,10 @@ export function DashboardSidebar() {
                       to={item.url} 
                       end
                       className={({ isActive }) => getNavClassName(isActive)}
+                      title={collapsed ? item.title : undefined}
                     >
                       <item.icon className="h-4 w-4 flex-shrink-0" />
-                      {!collapsed && <span className="ml-3">{item.title}</span>}
+                      {!collapsed && <span className="ml-3 truncate">{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -118,13 +119,13 @@ export function DashboardSidebar() {
                     <SidebarMenuItem key={content.name}>
                       <SidebarMenuButton asChild>
                         <div className="flex items-center justify-between w-full px-3 py-2 text-sm rounded-md hover:bg-muted/50 cursor-pointer">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
                               content.status === 'Published' ? 'bg-green-500' : 'bg-yellow-500'
                             }`}></div>
                             <span className="truncate">{content.name}</span>
                           </div>
-                          <span className={`text-xs px-2 py-1 rounded-full ${
+                          <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${
                             content.status === 'Published' 
                               ? 'bg-green-100 text-green-700'
                               : 'bg-yellow-100 text-yellow-700'
@@ -139,7 +140,7 @@ export function DashboardSidebar() {
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
                       <div className="flex items-center gap-2 w-full px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 cursor-pointer">
-                        <Plus className="h-4 w-4" />
+                        <Plus className="h-4 w-4 flex-shrink-0" />
                         <span>New Content</span>
                       </div>
                     </SidebarMenuButton>
