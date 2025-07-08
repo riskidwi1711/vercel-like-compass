@@ -14,13 +14,238 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      analytics: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          page_path: string
+          referrer: string | null
+          user_agent: string | null
+          visitor_id: string | null
+          website_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          page_path: string
+          referrer?: string | null
+          user_agent?: string | null
+          visitor_id?: string | null
+          website_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          page_path?: string
+          referrer?: string | null
+          user_agent?: string | null
+          visitor_id?: string | null
+          website_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "websites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          website_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          website_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          website_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "websites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content: {
+        Row: {
+          author_id: string
+          body: string | null
+          category_id: string | null
+          content_type: string
+          created_at: string
+          id: string
+          published_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          website_id: string
+        }
+        Insert: {
+          author_id: string
+          body?: string | null
+          category_id?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          website_id: string
+        }
+        Update: {
+          author_id?: string
+          body?: string | null
+          category_id?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          website_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "websites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      website_access: {
+        Row: {
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+          website_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: string
+          user_id: string
+          website_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+          website_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "website_access_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "websites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      websites: {
+        Row: {
+          created_at: string
+          domain: string
+          id: string
+          name: string
+          owner_id: string
+          theme: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          domain: string
+          id?: string
+          name: string
+          owner_id: string
+          theme?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          theme?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_website_access: {
+        Args: { user_uuid: string; website_uuid: string }
+        Returns: string
+      }
+      user_has_website_access: {
+        Args: { website_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

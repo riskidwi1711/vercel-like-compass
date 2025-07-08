@@ -116,8 +116,8 @@ export function DashboardHeader() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <div className="flex flex-col space-y-1 p-2">
-                <p className="text-sm font-medium">{user?.name || "John Doe"}</p>
-                <p className="text-xs text-muted-foreground">{user?.email || "john@example.com"}</p>
+                <p className="text-sm font-medium">{user?.user_metadata?.name || user?.email?.split('@')[0] || "User"}</p>
+                <p className="text-xs text-muted-foreground">{user?.email || "user@example.com"}</p>
               </div>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleProfile} className="cursor-pointer">
