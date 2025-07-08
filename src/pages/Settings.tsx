@@ -9,14 +9,39 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Save, Upload, Bell, Shield, Palette, Globe } from "lucide-react";
+import { Save, Upload, Bell, Shield, Palette, Globe, Crown } from "lucide-react";
 import { toast } from "sonner";
+import { SuperAdminPanel } from "@/components/SuperAdminPanel";
+import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Settings() {
+  const { user } = useAuth();
+  
+  // Check if user is superadmin
+  const { data: userProfile } = useQuery({
+    queryKey: ['user-profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+  
+  const isSuperAdmin = userProfile?.role === 'superadmin';
+
   const [profile, setProfile] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    bio: "Content management system administrator",
+    name: user?.user_metadata?.name || user?.email?.split('@')[0] || "User",
+    email: user?.email || "",
+    bio: "Content management system user",
     avatar: "/placeholder.svg"
   });
 
@@ -85,7 +110,7 @@ export default function Settings() {
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <Globe className="h-4 w-4" />
               Profile
@@ -102,6 +127,12 @@ export default function Settings() {
               <Palette className="h-4 w-4" />
               Appearance
             </TabsTrigger>
+            {isSuperAdmin && (
+              <TabsTrigger value="superadmin" className="flex items-center gap-2">
+                <Crown className="h-4 w-4 text-yellow-500" />
+                Super Admin
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
@@ -395,6 +426,12 @@ export default function Settings() {
               </CardContent>
             </Card>
           </TabsContent>
+          
+          {isSuperAdmin && (
+            <TabsContent value="superadmin" className="space-y-6">
+              <SuperAdminPanel />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>

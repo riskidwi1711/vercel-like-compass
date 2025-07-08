@@ -12,6 +12,7 @@ interface User {
   _id: string;
   name: string;
   email: string;
+  role?: string;
   websiteAccess: Array<{
     websiteId: string;
     role: string;
@@ -91,18 +92,24 @@ class ApiService {
     
     if (error) throw error;
     
-    // Get website access for user
-    const { data: access } = await supabase
-      .from('website_access')
-      .select('website_id, role')
-      .eq('user_id', user.id);
+    // Get website access for user (only if not superadmin)
+    let websiteAccess = [];
+    if (profile.role !== 'superadmin') {
+      const { data: access } = await supabase
+        .from('website_access')
+        .select('website_id, role')
+        .eq('user_id', user.id);
+      
+      websiteAccess = access?.map(a => ({ websiteId: a.website_id, role: a.role })) || [];
+    }
     
     return {
       data: {
         _id: profile.id,
         name: profile.name,
         email: profile.email,
-        websiteAccess: access?.map(a => ({ websiteId: a.website_id, role: a.role })) || [],
+        role: profile.role,
+        websiteAccess,
         createdAt: profile.created_at,
       }
     };
