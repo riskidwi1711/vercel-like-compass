@@ -12,7 +12,8 @@ import {
   Clock,
   CheckCircle,
   FileText,
-  Tags
+  Tags,
+  Package
 } from "lucide-react";
 import { useWebsite } from "@/hooks/useWebsite";
 
@@ -71,11 +72,11 @@ export default function Index() {
       icon: Tags
     },
     {
-      title: "Uptime",
-      value: "99.9%",
-      change: "Same as last month",
-      changeType: "neutral" as const,
-      icon: Activity
+      title: "Products",
+      value: isLoading ? "..." : error ? "Error" : stats?.productCount.toString() || "0",
+      change: "+5 from last week",
+      changeType: "positive" as const,
+      icon: Package
     }
   ];
 

@@ -144,6 +144,66 @@ export type Database = {
           },
         ]
       }
+      products: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          images: Json | null
+          name: string
+          price: number | null
+          sku: string | null
+          status: string
+          stock_quantity: number | null
+          updated_at: string
+          website_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: Json | null
+          name: string
+          price?: number | null
+          sku?: string | null
+          status?: string
+          stock_quantity?: number | null
+          updated_at?: string
+          website_id: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: Json | null
+          name?: string
+          price?: number | null
+          sku?: string | null
+          status?: string
+          stock_quantity?: number | null
+          updated_at?: string
+          website_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "websites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

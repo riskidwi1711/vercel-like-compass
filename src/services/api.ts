@@ -48,10 +48,26 @@ interface Content {
   updatedAt?: string;
 }
 
+interface Product {
+  _id: string;
+  name: string;
+  description?: string;
+  price?: number;
+  sku?: string;
+  categoryId?: string;
+  stockQuantity: number;
+  status: string;
+  images: string[];
+  websiteId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface DashboardStats {
   userCount: number;
   contentCount: number;
   categoryCount: number;
+  productCount: number;
 }
 
 class ApiService {
@@ -209,10 +225,11 @@ class ApiService {
 
   // Dashboard methods
   async getDashboardStats(websiteId: string) {
-    const [usersCount, contentCount, categoriesCount] = await Promise.all([
+    const [usersCount, contentCount, categoriesCount, productsCount] = await Promise.all([
       supabase.from('website_access').select('*', { count: 'exact', head: true }).eq('website_id', websiteId),
       supabase.from('content').select('*', { count: 'exact', head: true }).eq('website_id', websiteId),
       supabase.from('categories').select('*', { count: 'exact', head: true }).eq('website_id', websiteId),
+      supabase.from('products').select('*', { count: 'exact', head: true }).eq('website_id', websiteId),
     ]);
     
     return {
@@ -220,6 +237,7 @@ class ApiService {
         userCount: usersCount.count || 0,
         contentCount: contentCount.count || 0,
         categoryCount: categoriesCount.count || 0,
+        productCount: productsCount.count || 0,
       }
     };
   }
@@ -470,7 +488,130 @@ class ApiService {
     if (error) throw error;
     return { data: null };
   }
+
+  // Products methods
+  async getProducts(websiteId: string) {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('website_id', websiteId)
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    
+    return {
+      data: data.map(p => ({
+        _id: p.id,
+        name: p.name,
+        description: p.description,
+        price: p.price,
+        sku: p.sku,
+        categoryId: p.category_id,
+        stockQuantity: p.stock_quantity,
+        status: p.status,
+        images: Array.isArray(p.images) ? p.images.filter((img): img is string => typeof img === 'string') : [],
+        websiteId: p.website_id,
+        createdAt: p.created_at,
+        updatedAt: p.updated_at,
+      }))
+    };
+  }
+
+  async createProduct(websiteId: string, productData: {
+    name: string;
+    description?: string;
+    price?: number;
+    sku?: string;
+    categoryId?: string;
+    stockQuantity?: number;
+    status?: string;
+    images?: string[];
+  }) {
+    const { data, error } = await supabase
+      .from('products')
+      .insert({
+        name: productData.name,
+        description: productData.description,
+        price: productData.price,
+        sku: productData.sku,
+        category_id: productData.categoryId,
+        stock_quantity: productData.stockQuantity || 0,
+        status: productData.status || 'active',
+        images: productData.images || [],
+        website_id: websiteId,
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return {
+      data: {
+        _id: data.id,
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        sku: data.sku,
+        categoryId: data.category_id,
+        stockQuantity: data.stock_quantity,
+        status: data.status,
+        images: data.images || [],
+        websiteId: data.website_id,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+      }
+    };
+  }
+
+  async updateProduct(websiteId: string, productId: string, updateData: Partial<Product>) {
+    const { data, error } = await supabase
+      .from('products')
+      .update({
+        name: updateData.name,
+        description: updateData.description,
+        price: updateData.price,
+        sku: updateData.sku,
+        category_id: updateData.categoryId,
+        stock_quantity: updateData.stockQuantity,
+        status: updateData.status,
+        images: updateData.images,
+      })
+      .eq('id', productId)
+      .eq('website_id', websiteId)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return {
+      data: {
+        _id: data.id,
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        sku: data.sku,
+        categoryId: data.category_id,
+        stockQuantity: data.stock_quantity,
+        status: data.status,
+        images: data.images || [],
+        websiteId: data.website_id,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+      }
+    };
+  }
+
+  async deleteProduct(websiteId: string, productId: string) {
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', productId)
+      .eq('website_id', websiteId);
+    
+    if (error) throw error;
+    return { data: null };
+  }
 }
 
 export const apiService = new ApiService();
-export type { User, Category, Content, DashboardStats, Website, ApiResponse };
+export type { User, Category, Content, Product, DashboardStats, Website, ApiResponse };
