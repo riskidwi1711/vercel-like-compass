@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Content from "./pages/Content";
 import Categories from "./pages/Categories";
 import Products from "./pages/Products";
+import Plugins from "./pages/Plugins";
 import Users from "./pages/Users";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
@@ -56,6 +57,7 @@ const App = () => (
                           <Route path="/content" element={<Content />} />
                           <Route path="/categories" element={<Categories />} />
                           <Route path="/products" element={<Products />} />
+                          <Route path="/plugins" element={<Plugins />} />
                           <Route path="/users" element={<Users />} />
                           <Route path="/analytics" element={<Analytics />} />
                           <Route path="/settings" element={<Settings />} />
